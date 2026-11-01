@@ -9,10 +9,8 @@ import {
   FileText,
   Radio,
   ArrowRight,
-  ArrowUpRight,
   Gauge,
   TrendingUp,
-  CheckCircle,
   ShieldCheck,
   Sparkles,
   Clock,
@@ -37,7 +35,6 @@ const navItems = [
   { label: 'How It Works', href: '#development' },
   { label: 'Solutions', href: '#work' },
   { label: 'Analytics', href: '#analytics' },
-  { label: 'Insights', href: '#upgrade' },
   { label: 'FAQ', href: '#faq' },
 ]
 
@@ -68,13 +65,6 @@ const protocolsData = [
   { icon: Zap, title: 'Track real-time energy', text: 'Live readings from your meters and sensors.' },
   { icon: Leaf, title: 'Measure carbon output', text: 'Translate energy use into tCO₂e estimates.' },
   { icon: Brain, title: 'Detect anomalies early', text: 'Flag waste, spikes and idle load automatically.' },
-]
-
-const upgradeData = [
-  'Real-Time Visibility',
-  'AI-Powered Recommendations',
-  'Carbon Accounting',
-  'Audit-Ready Reports',
 ]
 
 const perksData = [
@@ -372,33 +362,53 @@ const Work = () => (
         </Reveal>
         <Reveal className="lg:col-span-5 col-span-12" delay={0.1}>
           <div className="group relative mx-auto max-w-md lg:mx-0">
-            <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-soft-mint/70 blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-10 -left-8 h-36 w-36 rounded-full bg-teal-accent/20 blur-2xl" />
+            <div className="pointer-events-none absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-teal-accent/15 via-primary-green/10 to-transparent blur-2xl" />
 
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-surface shadow-2xl shadow-deep-teal/10">
-              <img
-                src="/Smart%20IoT%20Monitoring%20in%20Electrical%20Cabinet.png"
-                alt="JEJAK operations"
-                className="h-[300px] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 sm:h-[380px] lg:h-[430px]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-deep-teal/60 via-transparent to-transparent" />
-              <span className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-primary-green shadow-sm backdrop-blur">
-                AIoT
-              </span>
-              <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] font-medium text-deep-teal shadow-sm backdrop-blur">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-green" /> Langsung
-              </span>
-            </div>
+            <div className="relative overflow-hidden rounded-[2rem] border border-border bg-surface shadow-2xl shadow-deep-teal/15 ring-1 ring-black/[0.03] transition-transform duration-500 group-hover:-translate-y-1">
+              <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-soft-mint text-primary-green">
+                    <Radio className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-semibold text-main-text">JEJAK Operations</p>
+                    <p className="truncate text-[11px] text-secondary-text">Konsol AIoT</p>
+                  </div>
+                </div>
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-soft-mint px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary-green">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-green" />
+                  Langsung
+                </span>
+              </div>
 
-            <div className="relative -mt-8 ml-5 mr-5 flex items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 shadow-xl">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-deep-teal to-primary-green text-white">
-                <Radio className="h-5 w-5" />
+              <div className="relative">
+                <img
+                  src="/Smart%20IoT%20Monitoring%20in%20Electrical%20Cabinet.png"
+                  alt="JEJAK operations"
+                  className="h-[250px] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 sm:h-[300px] lg:h-[330px]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-deep-teal/80 via-deep-teal/20 to-transparent" />
+                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary-green shadow-sm backdrop-blur">
+                  AIoT
+                </span>
+                <div className="absolute inset-x-4 bottom-4">
+                  <p className="text-base font-semibold text-white">Pemantauan Perangkat Langsung</p>
+                  <p className="mt-0.5 text-xs text-white/75">Meteran, sensor &amp; gateway dalam satu konsol</p>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-main-text">Pemantauan Perangkat Langsung</p>
-                <p className="truncate text-xs text-secondary-text">Meteran, sensor &amp; gateway dalam satu konsol</p>
+
+              <div className="grid grid-cols-3 divide-x divide-border bg-surface">
+                {[
+                  { value: '15', label: 'Perangkat' },
+                  { value: '99.2%', label: 'Uptime' },
+                  { value: '24/7', label: 'Pemantauan' },
+                ].map((stat) => (
+                  <div key={stat.label} className="px-3 py-3 text-center">
+                    <p className="text-sm font-bold text-main-text">{stat.value}</p>
+                    <p className="text-[10px] uppercase tracking-wide text-secondary-text">{stat.label}</p>
+                  </div>
+                ))}
               </div>
-              <ArrowUpRight className="h-4 w-4 shrink-0 text-secondary-text transition-colors group-hover:text-primary-green" />
             </div>
           </div>
         </Reveal>
@@ -546,42 +556,6 @@ const Analytics = () => (
                 </div>
               )
             })}
-          </div>
-        </Reveal>
-      </div>
-    </Container>
-  </Section>
-)
-
-const Upgrade = () => (
-  <Section id="upgrade">
-    <Container>
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
-        <Reveal>
-          <SectionHeader
-            eyebrow={<span className="text-primary-green">Upgrade</span>}
-            title="Turn your data into an advantage."
-            subtitle="Move from manual tracking and guesswork to a single, reliable operational view."
-          />
-          <div className="grid sm:grid-cols-2 gap-4 mt-8">
-            {upgradeData.map((item) => (
-              <div
-                key={item}
-                className="flex gap-3 items-center rounded-xl border border-border bg-surface px-4 py-3 shadow-sm"
-              >
-                <CheckCircle className="w-5 h-5 text-primary-green shrink-0" />
-                <h4 className="text-16 font-medium text-main-text">{item}</h4>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div className="rounded-3xl bg-gradient-to-br from-soft-mint/70 to-transparent p-6">
-            <img
-              src="/images/upgrade/img-upgrade.png"
-              alt="JEJAK upgrade"
-              className="w-full max-h-[440px] object-contain"
-            />
           </div>
         </Reveal>
       </div>
@@ -794,7 +768,6 @@ export default function LandingPage() {
         <Timeline />
         <Platform />
         <Analytics />
-        <Upgrade />
         <Perks />
         <Faq />
         <FinalCta />
