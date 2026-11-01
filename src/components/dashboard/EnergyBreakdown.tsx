@@ -6,8 +6,9 @@ import { useFilters } from '../../lib/FiltersContext'
 import { getAreaStats } from '../../lib/calculations'
 import { formatCurrencyIDR, formatMWh } from '../../lib/formatters'
 import { areaLabel } from '../../lib/id'
+import { ENERGY_PALETTE } from '../../lib/chartColors'
 
-const COLORS = ['#059669', '#14B8A6', '#0F766E', '#5EEAD4', '#99F6E4']
+const COLORS = ENERGY_PALETTE
 
 type PieEntry = { name?: string; value?: number; payload?: { area: string; share: number } }
 

@@ -25,6 +25,7 @@ import {
   getTrendDelta,
 } from '../../lib/calculations'
 import { formatCurrencyIDRCompact, formatMWh, formatTCO2e } from '../../lib/formatters'
+import { BASELINE_COLOR, CARBON_COLOR, ENERGY_COLOR } from '../../lib/chartColors'
 
 type ViewMode = 'Energy' | 'Carbon' | 'Combined'
 
@@ -144,14 +145,14 @@ const EnergyCarbonChart = () => {
           <h3 className="text-lg font-semibold text-main-text">Tren Energi &amp; Karbon</h3>
           <p className="text-xs text-secondary-text">Tampilan gabungan memakai dua sumbu Y terpisah</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
-            <span className="inline-flex items-center gap-1.5 text-xs text-secondary-text">
-              <span className="h-2 w-2 rounded-full bg-teal-accent" /> Energi
+              <span className="inline-flex items-center gap-1.5 text-xs text-secondary-text">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: ENERGY_COLOR }} /> Energi
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs text-secondary-text">
-              <span className="h-2 w-2 rounded-full bg-primary-green" /> Karbon
+              <span className="h-0 w-4 border-t-2 border-dashed" style={{ borderColor: CARBON_COLOR }} /> Karbon
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs text-secondary-text">
-              <span className="h-0.5 w-4 rounded-full bg-warning" /> Rata-rata baseline
+              <span className="h-0 w-4 border-t-2 border-dashed" style={{ borderColor: BASELINE_COLOR }} /> Rata-rata baseline
             </span>
           </div>
         </div>
@@ -215,12 +216,12 @@ const EnergyCarbonChart = () => {
           <AreaChart data={data} margin={{ top: 5, right: 16, bottom: 5, left: 0 }}>
             <defs>
               <linearGradient id="energyFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#14B8A6" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#14B8A6" stopOpacity={0.02} />
+                <stop offset="0%" stopColor={ENERGY_COLOR} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={ENERGY_COLOR} stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="carbonFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#059669" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#059669" stopOpacity={0.02} />
+                <stop offset="0%" stopColor={CARBON_COLOR} stopOpacity={0.3} />
+                <stop offset="100%" stopColor={CARBON_COLOR} stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -229,7 +230,7 @@ const EnergyCarbonChart = () => {
               <YAxis
                 yAxisId="energy"
                 orientation="left"
-                stroke="var(--color-teal-accent)"
+                stroke={ENERGY_COLOR}
                 tick={{ fontSize: 12 }}
                 label={{ value: 'Energi (MWh)', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: 'var(--color-secondary-text)' } }}
               />
@@ -238,7 +239,7 @@ const EnergyCarbonChart = () => {
               <YAxis
                 yAxisId="carbon"
                 orientation="right"
-                stroke="var(--color-primary-green)"
+                stroke={CARBON_COLOR}
                 tick={{ fontSize: 12 }}
                 label={{ value: 'Karbon (tCO₂e)', angle: 90, position: 'insideRight', style: { fontSize: 12, fill: 'var(--color-secondary-text)' } }}
               />
@@ -249,9 +250,9 @@ const EnergyCarbonChart = () => {
               <ReferenceLine
                 yAxisId="energy"
                 y={baselineAvg}
-                stroke="var(--color-warning)"
-                strokeDasharray="5 4"
-                label={{ value: 'Rata-rata baseline', position: 'insideTopRight', fontSize: 10, fill: 'var(--color-warning)' }}
+                stroke={BASELINE_COLOR}
+                strokeDasharray="2 4"
+                label={{ value: 'Rata-rata baseline', position: 'insideTopRight', fontSize: 10, fill: BASELINE_COLOR }}
               />
             )}
             {showEnergy && (
@@ -259,7 +260,7 @@ const EnergyCarbonChart = () => {
                 yAxisId="energy"
                 type="monotone"
                 dataKey="energy"
-                stroke="var(--color-teal-accent)"
+                stroke={ENERGY_COLOR}
                 strokeWidth={2.5}
                 fill="url(#energyFill)"
                 name="Energi (MWh)"
@@ -270,10 +271,11 @@ const EnergyCarbonChart = () => {
                 yAxisId="carbon"
                 type="monotone"
                 dataKey="carbon"
-                stroke="var(--color-primary-green)"
-                strokeWidth={2.5}
-                fill="url(#carbonFill)"
-                name="Karbon (tCO₂e)"
+                 stroke={CARBON_COLOR}
+                 strokeWidth={2.5}
+                 strokeDasharray="6 4"
+                 fill="url(#carbonFill)"
+                 name="Karbon (tCO₂e)"
               />
             )}
           </AreaChart>

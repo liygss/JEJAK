@@ -30,6 +30,7 @@ import {
   getTrendDelta,
 } from '../lib/calculations'
 import { formatCurrencyIDR, formatMWh, formatTCO2e } from '../lib/formatters'
+import { CARBON_COLOR, ENERGY_COLOR } from '../lib/chartColors'
 
 const DashboardPage = () => {
   const { openSidebar } = useSidebar()
@@ -89,7 +90,7 @@ const DashboardPage = () => {
                 trend={{ value: energyDelta, label: 'vs periode sebelumnya' }}
                 lowerIsBetter
                 sparkline={energySeries.map((d) => d.value)}
-                sparkColor="#14B8A6"
+                sparkColor={ENERGY_COLOR}
                 tooltip="Total konsumsi energi terukur di seluruh area yang dipantau untuk periode yang dipilih."
               />
             </StaggerItem>
@@ -103,7 +104,7 @@ const DashboardPage = () => {
                 trend={{ value: carbonDelta, label: 'vs periode sebelumnya' }}
                 lowerIsBetter
                 sparkline={carbonSeries.map((d) => d.value)}
-                sparkColor="#059669"
+                sparkColor={CARBON_COLOR}
                 tooltip="Estimasi emisi karbon dari konsumsi energi menggunakan faktor emisi yang dikonfigurasi."
               />
             </StaggerItem>

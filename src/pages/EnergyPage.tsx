@@ -11,6 +11,7 @@ import { useFilters } from '../lib/FiltersContext'
 import { formatCurrencyIDR, formatMWh } from '../lib/formatters'
 import { calculateTotalEnergy, calculateTotalCost } from '../lib/calculations'
 import { areaLabel, ENERGY_SOURCE_LABEL } from '../lib/id'
+import { BASELINE_COLOR, ENERGY_COLOR } from '../lib/chartColors'
 
 type SortKey = 'timestamp' | 'area' | 'consumptionMWh'
 
@@ -128,8 +129,8 @@ const EnergyPage = () => {
                 <YAxis stroke="var(--color-secondary-text)" tick={{ fontSize: 12 }} label={{ value: 'MWh', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: 'var(--color-secondary-text)' } }} />
                 <RTooltip contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '12px', fontSize: '12px' }} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Line type="monotone" dataKey="consumption" stroke="var(--color-teal-accent)" strokeWidth={2} name="Konsumsi (MWh)" dot={false} />
-                <Line type="monotone" dataKey="baseline" stroke="var(--color-secondary-text)" strokeWidth={1.5} strokeDasharray="4 4" name="Baseline (MWh)" dot={false} />
+                <Line type="monotone" dataKey="consumption" stroke={ENERGY_COLOR} strokeWidth={2} name="Konsumsi (MWh)" dot={false} />
+                <Line type="monotone" dataKey="baseline" stroke={BASELINE_COLOR} strokeWidth={1.5} strokeDasharray="4 4" name="Baseline (MWh)" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>

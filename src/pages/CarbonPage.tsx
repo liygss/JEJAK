@@ -12,8 +12,9 @@ import { useToast } from '../components/ui/Toast'
 import { formatTCO2e } from '../lib/formatters'
 import { calculateTotalCarbon } from '../lib/calculations'
 import { CARBON_STATUS_LABEL, SCOPE_LABEL, areaLabel } from '../lib/id'
+import { CARBON_COLOR, CARBON_PALETTE } from '../lib/chartColors'
 
-const SOURCE_COLORS = ['#059669', '#14B8A6', '#0F766E', '#5EEAD4']
+const SOURCE_COLORS = CARBON_PALETTE
 
 const CarbonPage = () => {
   const { openSidebar } = useSidebar()
@@ -171,7 +172,7 @@ const CarbonPage = () => {
                   <RTooltip
                     contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '12px', fontSize: '12px' }}
                   />
-                  <Line type="monotone" dataKey="emissions" stroke="var(--color-primary-green)" strokeWidth={2} name="tCO₂e" dot={false} />
+                  <Line type="monotone" dataKey="emissions" stroke={CARBON_COLOR} strokeWidth={2} name="tCO₂e" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
