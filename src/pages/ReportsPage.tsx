@@ -6,9 +6,9 @@ import AppHeader from '../components/layout/AppHeader'
 import { useSidebar } from '../components/layout/DashboardLayout'
 import { useToast } from '../components/ui/Toast'
 import { useFilters } from '../lib/FiltersContext'
+import { useCombinedCarbon } from '../lib/FuelLogContext'
 import { downloadPdf } from '../lib/pdf'
 import { energyRecords } from '../data/energy'
-import { carbonRecords } from '../data/carbon'
 import { insights } from '../data/insights'
 import { buildCsv, reportTemplates, type ReportSlug } from '../data/reports'
 import { PERIOD_LABEL, REPORT_STATUS_LABEL } from '../lib/id'
@@ -35,13 +35,14 @@ const ReportsPage = () => {
   const { openSidebar } = useSidebar()
   const { plant, period, filterEnergy, filterCarbon } = useFilters()
   const { toast } = useToast()
+  const combinedCarbon = useCombinedCarbon()
 
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('All')
   const [pdfSlug, setPdfSlug] = useState<ReportSlug | null>(null)
 
   const plantEnergy = useMemo(() => filterEnergy(energyRecords), [filterEnergy])
-  const plantCarbon = useMemo(() => filterCarbon(carbonRecords), [filterCarbon])
+  const plantCarbon = useMemo(() => filterCarbon(combinedCarbon), [filterCarbon, combinedCarbon])
   const recordsFor = useMemo<Record<ReportSlug, number>>(
     () => ({
       energy: plantEnergy.length,

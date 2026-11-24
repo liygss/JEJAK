@@ -26,6 +26,15 @@ export type CbamCommodity = {
   reducingAgent: string
 }
 
+export const cbamSectors = [
+  'Semen',
+  'Besi & baja',
+  'Aluminium',
+  'Pupuk',
+  'Listrik',
+  'Hidrogen',
+] as const
+
 export const cbamCommodities: CbamCommodity[] = [
   {
     id: 'steel',
@@ -62,6 +71,30 @@ export const cbamCommodities: CbamCommodity[] = [
     cnCode: 76031000,
     productionRoute: 'All production routes',
     reducingAgent: 'n.a.',
+  },
+  {
+    id: 'fertiliser',
+    name: 'Pupuk (urea)',
+    ratePerTonneEur: 95,
+    defaultTonnes: 1000,
+    defaultEmbeddedIntensity: 1.2,
+    note: 'Referensi ilustratif. Kode CN contoh untuk urea; klasifikasi resmi harus diverifikasi.',
+    goodsCategory: 'Fertilisers',
+    cnCode: 31021000,
+    productionRoute: 'All production routes',
+    reducingAgent: 'Natural gas',
+  },
+  {
+    id: 'hydrogen',
+    name: 'Hidrogen',
+    ratePerTonneEur: 480,
+    defaultTonnes: 500,
+    defaultEmbeddedIntensity: 9.3,
+    note: 'Referensi ilustratif. Kode CN contoh untuk hidrogen; klasifikasi resmi harus diverifikasi.',
+    goodsCategory: 'Hydrogen',
+    cnCode: 28041000,
+    productionRoute: 'Steam methane reforming (ilustratif)',
+    reducingAgent: 'Natural gas',
   },
 ]
 

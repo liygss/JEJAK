@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import type { CarbonRecord, EnergyRecord, PlantOption } from '../data/types'
+import type { CarbonRecord, EnergyRecord, FuelRecord, PlantOption } from '../data/types'
 
 export type { PlantOption }
 
@@ -12,6 +12,7 @@ type FiltersContextValue = {
   setPeriod: (p: PeriodOption) => void
   filterEnergy: (records: EnergyRecord[]) => EnergyRecord[]
   filterCarbon: (records: CarbonRecord[]) => CarbonRecord[]
+  filterFuel: (records: FuelRecord[]) => FuelRecord[]
   loading: boolean
   refresh: () => void
   lastUpdated: string
@@ -76,6 +77,14 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
     [plant, period]
   )
 
+  const filterFuel = useCallback(
+    (records: FuelRecord[]) => {
+      const forPlant = records.filter((r) => r.plant === plant)
+      return withinPeriod(forPlant, period, referenceDate(forPlant))
+    },
+    [plant, period]
+  )
+
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), [])
 
   const value = useMemo<FiltersContextValue>(
@@ -86,11 +95,12 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
       setPeriod,
       filterEnergy,
       filterCarbon,
+      filterFuel,
       loading,
       refresh,
       lastUpdated,
     }),
-    [plant, period, filterEnergy, filterCarbon, loading, refresh, lastUpdated]
+    [plant, period, filterEnergy, filterCarbon, filterFuel, loading, refresh, lastUpdated]
   )
 
   return <FiltersContext.Provider value={value}>{children}</FiltersContext.Provider>

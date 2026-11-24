@@ -13,8 +13,8 @@ import {
   ReferenceLine,
 } from 'recharts'
 import { energyRecords } from '../../data/energy'
-import { carbonRecords as carbonData } from '../../data/carbon'
 import { useFilters } from '../../lib/FiltersContext'
+import { useCombinedCarbon } from '../../lib/FuelLogContext'
 import {
   calculateRealizedSavings,
   countAboveBaseline,
@@ -75,12 +75,13 @@ const TrendBadge = ({ value }: { value: number }) => {
 
 const EnergyCarbonChart = () => {
   const { filterEnergy, filterCarbon } = useFilters()
+  const combinedCarbon = useCombinedCarbon()
   const reduce = useReducedMotion()
   const [view, setView] = useState<ViewMode>('Combined')
 
   const data = useMemo(() => {
     const energy = filterEnergy(energyRecords)
-    const carbon = filterCarbon(carbonData)
+    const carbon = filterCarbon(combinedCarbon)
 
     const dailyEnergy = energy.reduce((acc, record) => {
       acc[record.timestamp] = (acc[record.timestamp] ?? 0) + record.consumptionMWh
@@ -105,7 +106,7 @@ const EnergyCarbonChart = () => {
       baseline: Number((dailyBaseline[date] ?? 0).toFixed(2)),
       carbon: Number((dailyCarbon[date] ?? 0).toFixed(2)),
     }))
-  }, [filterEnergy, filterCarbon])
+  }, [filterEnergy, filterCarbon, combinedCarbon])
 
   const baselineAvg =
     data.length > 0 ? data.reduce((s, d) => s + d.baseline, 0) / data.length : 0
@@ -115,7 +116,7 @@ const EnergyCarbonChart = () => {
 
   const metrics = useMemo(() => {
     const energy = filterEnergy(energyRecords)
-    const carbon = filterCarbon(carbonData)
+    const carbon = filterCarbon(combinedCarbon)
     const energySeries = getDailyEnergySeries(energy)
     const carbonSeries = getDailyCarbonSeries(carbon)
     const avgEnergy = energySeries.length ? energySeries.reduce((s, d) => s + d.value, 0) / energySeries.length : 0
@@ -130,7 +131,7 @@ const EnergyCarbonChart = () => {
       peak: getPeakDay(energy),
       realizedSavings: calculateRealizedSavings(energy),
     }
-  }, [filterEnergy, filterCarbon])
+  }, [filterEnergy, filterCarbon, combinedCarbon])
 
   return (
     <motion.div

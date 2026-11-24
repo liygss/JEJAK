@@ -7,6 +7,8 @@
  * penerjemahan tidak merusak logika.
  */
 import type { AlertSeverity, DeviceStatus, DataQuality, DeviceType } from '../data/admin'
+import type { FuelCategory } from '../data/types'
+import { FUEL_FACTORS } from '../data/fuelFactors'
 import type { PlantOption, PeriodOption } from './FiltersContext'
 
 type LabelMap<K extends string> = Record<K, string>
@@ -44,6 +46,18 @@ export const INSIGHT_STATUS_LABEL: Record<'New' | 'Reviewed', string> = {
 export const ENERGY_SOURCE_LABEL: Record<'IoT Simulation' | 'Manual Entry', string> = {
   'IoT Simulation': 'IoT',
   'Manual Entry': 'Input Manual',
+}
+
+/** Jenis bahan bakar. */
+export const FUEL_TYPE_LABEL: Record<keyof typeof FUEL_FACTORS, string> = Object.fromEntries(
+  Object.entries(FUEL_FACTORS).map(([key, factor]) => [key, factor.label])
+) as Record<keyof typeof FUEL_FACTORS, string>
+
+/** Kategori bahan bakar. */
+export const FUEL_CATEGORY_LABEL: Record<FuelCategory, string> = {
+  Liquid: 'Cair',
+  Gas: 'Gas',
+  Solid: 'Padat',
 }
 
 /** Status data carbon. */

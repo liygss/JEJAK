@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import SectionHeader from '../components/landing/SectionHeader'
 import Reveal from '../components/ui/Reveal'
+import { usePageMeta } from '../lib/usePageMeta'
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -35,6 +36,7 @@ const navItems = [
   { label: 'How It Works', href: '#development' },
   { label: 'Solutions', href: '#work' },
   { label: 'Analytics', href: '#analytics' },
+  { label: 'CBAM Report', href: '#cbam-report' },
   { label: 'FAQ', href: '#faq' },
 ]
 
@@ -285,14 +287,14 @@ const Hero = () => (
               to="/dashboard"
               className="inline-flex items-center gap-2 bg-primary-green border border-primary-green rounded-lg text-21 font-medium hover:bg-deep-teal text-white py-3 px-8 transition-colors"
             >
-              Open Dashboard
+              Buka Dashboard
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              to="/admin"
+              to="/dashboard"
               className="bg-transparent border border-primary-green rounded-lg text-21 font-medium hover:bg-soft-mint text-primary-green py-3 px-8 transition-colors"
             >
-              Admin
+              Lihat Dashboard
             </Link>
           </div>
         </motion.div>
@@ -599,6 +601,81 @@ const Perks = () => (
   </Section>
 )
 
+const CbamFeature = () => {
+  const steps = [
+    {
+      icon: BarChart3,
+      title: '1. Pilih komoditas & volume',
+      text: 'Simulasikan eksposur CBAM untuk baja, semen, aluminium, pupuk, dan hidrogen dengan data contoh.',
+    },
+    {
+      icon: ShieldCheck,
+      title: '2. Hubungkan data MRV',
+      text: 'Emisi terpantau, aliran sumber, dan daftar periksa kesiapan dirangkum dalam satu alur laporan.',
+    },
+    {
+      icon: FileText,
+      title: '3. Unduh laporan',
+      text: 'Hasilkan PDF tiga halaman dan isi sebagian template resmi UE dengan satu klik.',
+    },
+  ]
+
+  return (
+    <Section id="cbam-report" className="bg-soft-mint/40">
+      <Container>
+        <div className="grid grid-cols-12 gap-10 items-start">
+          <Reveal className="lg:col-span-5 col-span-12">
+            <SectionHeader
+              eyebrow={
+                <>
+                  Fitur utama • <span className="text-primary-green">Laporan CBAM</span>
+                </>
+              }
+              title="Dari data pabrik ke dokumen CBAM."
+              subtitle="Simulasi biaya, kesiapan pelaporan, dan ekspor PDF/Excel dalam satu halaman. Strukturnya mengikuti Communication Template for Installations (EU CBAM V2)."
+            />
+            <div className="flex flex-wrap gap-4 mt-8">
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-2 bg-primary-green text-white px-7 py-3 rounded-lg font-medium hover:bg-deep-teal transition-colors"
+              >
+                Buka Dashboard
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-2 border border-primary-green text-primary-green px-7 py-3 rounded-lg font-medium hover:bg-soft-mint transition-colors"
+              >
+                Lihat Dashboard
+              </Link>
+            </div>
+            <p className="text-secondary-text text-16 mt-6 max-w-lg">
+              Seluruh angka bersifat ilustratif. JEJAK bukan layanan pelaporan resmi dan bukan nasihat hukum, pajak, atau kepatuhan.
+            </p>
+          </Reveal>
+
+          <div className="lg:col-span-7 col-span-12 grid gap-4">
+            {steps.map((step) => {
+              const Icon = step.icon
+              return (
+                <div key={step.title} className="flex gap-5 bg-surface border border-border rounded-2xl p-6 shadow-sm">
+                  <div className="bg-soft-mint p-3 rounded-xl h-fit">
+                    <Icon className="w-6 h-6 text-primary-green" />
+                  </div>
+                  <div>
+                    <h3 className="text-20 font-semibold text-main-text">{step.title}</h3>
+                    <p className="text-secondary-text text-17 mt-2">{step.text}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </Container>
+    </Section>
+  )
+}
+
 const Faq = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
   return (
@@ -661,14 +738,14 @@ const FinalCta = () => (
               to="/dashboard"
               className="inline-flex items-center gap-2 bg-white text-primary-green py-3 px-7 rounded-lg sm:text-21 text-18 font-medium hover:bg-deep-teal hover:text-white transition-colors"
             >
-              Open Dashboard
+              Buka Dashboard
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              to="/admin"
+              to="/dashboard"
               className="inline-flex items-center gap-2 border border-white/60 text-white py-3 px-7 rounded-lg sm:text-21 text-18 font-medium hover:bg-white hover:text-primary-green transition-colors"
             >
-              Admin
+              Lihat Dashboard
             </Link>
           </div>
         </div>
@@ -727,6 +804,7 @@ const Footer = () => (
               { label: 'Carbon', to: '/dashboard/carbon' },
               { label: 'Insights', to: '/dashboard/insights' },
               { label: 'Reports', to: '/dashboard/reports' },
+              { label: 'Laporan', to: '/dashboard' },
             ].map((item) => (
               <li key={item.label} className="pb-4">
                 <Link to={item.to} className="text-white/80 hover:text-primary-green transition-colors text-17">
@@ -759,6 +837,10 @@ const Footer = () => (
 /* ------------------------------------------------------------------ */
 
 export default function LandingPage() {
+  usePageMeta(
+    'JEJAK — Laporan CBAM & Intelijen Energi Karbon',
+    'Buat laporan CBAM ilustratif dari data energi dan emisi: simulasi biaya, kesiapan pelaporan, dan ekspor PDF/Excel UE.'
+  )
   return (
     <div className="font-dmsans bg-main-bg text-main-text min-h-screen">
       <Header />
@@ -769,6 +851,7 @@ export default function LandingPage() {
         <Platform />
         <Analytics />
         <Perks />
+        <CbamFeature />
         <Faq />
         <FinalCta />
       </main>

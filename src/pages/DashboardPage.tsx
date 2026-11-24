@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Zap, Leaf, DollarSign, Target, PiggyBank, Activity, TriangleAlert, CalendarDays } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Zap, Leaf, DollarSign, Target, PiggyBank, Activity, TriangleAlert, CalendarDays, ShieldCheck, ArrowRight } from 'lucide-react'
 import AppHeader from '../components/layout/AppHeader'
 import { useSidebar } from '../components/layout/DashboardLayout'
 import KpiCard from '../components/dashboard/KpiCard'
@@ -8,13 +9,15 @@ import EnergyBreakdown from '../components/dashboard/EnergyBreakdown'
 import AiInsightCard from '../components/dashboard/AiInsightCard'
 import DeviceStatus from '../components/dashboard/DeviceStatus'
 import RecentActivity from '../components/dashboard/RecentActivity'
-import { Stagger, StaggerItem } from '../components/ui/Reveal'
+import { Reveal, Stagger, StaggerItem } from '../components/ui/Reveal'
 import { SkeletonCard, SkeletonChart } from '../components/ui/Skeleton'
 import { energyRecords } from '../data/energy'
-import { carbonRecords as carbonData } from '../data/carbon'
 import { insights as initialInsights } from '../data/insights'
+import { getCommodity, EUR_TO_IDR } from '../data/cbam'
 import type { Insight } from '../data/types'
 import { useFilters } from '../lib/FiltersContext'
+import { useNodeReport } from '../lib/NodeReportContext'
+import { useCombinedCarbon } from '../lib/FuelLogContext'
 import { useToast } from '../components/ui/Toast'
 import {
   calculateTotalEnergy,
@@ -29,12 +32,14 @@ import {
   getPeakDay,
   getTrendDelta,
 } from '../lib/calculations'
-import { formatCurrencyIDR, formatMWh, formatTCO2e } from '../lib/formatters'
+import { formatCurrencyIDR, formatCurrencyIDRCompact, formatMWh, formatTCO2e } from '../lib/formatters'
 import { CARBON_COLOR, ENERGY_COLOR } from '../lib/chartColors'
 
 const DashboardPage = () => {
   const { openSidebar } = useSidebar()
   const { filterEnergy, filterCarbon, loading } = useFilters()
+  const { snapshot } = useNodeReport()
+  const combinedCarbon = useCombinedCarbon()
   const { toast } = useToast()
   const [insights, setInsights] = useState<Insight[]>(initialInsights)
 
@@ -48,7 +53,7 @@ const DashboardPage = () => {
   }
 
   const filteredEnergy = filterEnergy(energyRecords)
-  const filteredCarbon = filterCarbon(carbonData)
+  const filteredCarbon = filterCarbon(combinedCarbon)
 
   const totalEnergy = calculateTotalEnergy(filteredEnergy)
   const totalCarbon = calculateTotalCarbon(filteredCarbon)
@@ -67,6 +72,8 @@ const DashboardPage = () => {
   const efficiency = getEfficiencyScore(filteredEnergy)
   const aboveBaseline = countAboveBaseline(filteredEnergy)
   const peak = getPeakDay(filteredEnergy)
+  const cbamNodeCommodity = getCommodity(snapshot.commodityId)
+  const cbamNodeIDR = cbamNodeCommodity.ratePerTonneEur * snapshot.tonnes * EUR_TO_IDR
 
   return (
     <>
@@ -105,7 +112,7 @@ const DashboardPage = () => {
                 lowerIsBetter
                 sparkline={carbonSeries.map((d) => d.value)}
                 sparkColor={CARBON_COLOR}
-                tooltip="Estimasi emisi karbon dari konsumsi energi menggunakan faktor emisi yang dikonfigurasi."
+                tooltip="Estimasi emisi dari konsumsi energi (Scope 2) dan pembakaran bahan bakar (Scope 1)."
               />
             </StaggerItem>
             <StaggerItem>
@@ -190,6 +197,36 @@ const DashboardPage = () => {
             </div>
           </div>
         )}
+
+        <Reveal>
+          <div className="relative overflow-hidden rounded-18 border border-primary-green/20 bg-gradient-to-br from-soft-mint/80 via-surface to-surface p-5 shadow-sm md:p-6">
+            <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-teal-accent/10 blur-2xl" />
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-12 bg-white text-primary-green shadow-sm">
+                  <ShieldCheck size={22} />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold text-main-text">Laporan CBAM</h2>
+                    <span className="rounded-full bg-primary-green/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-green">
+                      Fitur utama
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-secondary-text">
+                    {snapshot.sourceLabel}. Nilai laporan terisi otomatis: {snapshot.tonnes.toLocaleString('id-ID')} ton {cbamNodeCommodity.name.toLowerCase()} ≈ {formatCurrencyIDRCompact(cbamNodeIDR)} (ilustratif).
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/dashboard/cbam"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-12 bg-primary-green px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-deep-teal"
+              >
+                Buka Laporan CBAM <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="h-full xl:col-span-2">

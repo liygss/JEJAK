@@ -6,8 +6,8 @@ import { useSidebar } from '../components/layout/DashboardLayout'
 import KpiCard from '../components/dashboard/KpiCard'
 import { Stagger, StaggerItem } from '../components/ui/Reveal'
 import { Skeleton, SkeletonCard, SkeletonChart } from '../components/ui/Skeleton'
-import { carbonRecords as carbonData } from '../data/carbon'
 import { useFilters } from '../lib/FiltersContext'
+import { useCombinedCarbon } from '../lib/FuelLogContext'
 import { useToast } from '../components/ui/Toast'
 import { formatTCO2e } from '../lib/formatters'
 import { calculateTotalCarbon } from '../lib/calculations'
@@ -19,10 +19,11 @@ const SOURCE_COLORS = CARBON_PALETTE
 const CarbonPage = () => {
   const { openSidebar } = useSidebar()
   const { filterCarbon, plant, period, loading } = useFilters()
+  const combinedCarbon = useCombinedCarbon()
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
 
-  const periodData = useMemo(() => filterCarbon(carbonData), [filterCarbon])
+  const periodData = useMemo(() => filterCarbon(combinedCarbon), [filterCarbon, combinedCarbon])
 
   const totalEmissions = calculateTotalCarbon(periodData)
   const scope1 = periodData.filter((r) => r.scope === 'Scope 1').reduce((s, r) => s + r.emissionsTCO2e, 0)

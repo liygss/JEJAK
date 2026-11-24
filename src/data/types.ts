@@ -1,5 +1,28 @@
 export type PlantOption = 'Manufacturing Plant A' | 'Manufacturing Plant B'
 
+export type FuelType = 'Diesel' | 'MFO' | 'NaturalGas' | 'LPG' | 'CNG' | 'Coal' | 'Biomass'
+
+export type FuelCategory = 'Liquid' | 'Gas' | 'Solid'
+
+export type FuelUnit = 'L' | 'm³' | 'kg' | 'ton'
+
+export type FuelRecord = {
+  id: string
+  timestamp: string
+  plant: PlantOption
+  fuelType: FuelType
+  category: FuelCategory
+  quantity: number
+  unit: FuelUnit
+  equipment: string
+  source: 'IoT Simulation' | 'Manual Entry'
+  dataStatus: 'Estimated' | 'Recorded'
+  ncvGJPerUnit: number
+  efTCO2PerTJ: number
+  emissionsTCO2e: number
+  note?: string
+}
+
 export type EnergyRecord = {
   timestamp: string
   plant: PlantOption

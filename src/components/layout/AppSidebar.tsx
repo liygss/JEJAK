@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import {
   BarChart3,
   BatteryCharging,
+  Fuel,
   Leaf,
   Sparkles,
   FileText,
@@ -17,9 +18,10 @@ import { PLANT_LABEL } from '../../lib/id'
 
 const navItems = [
   { to: '/dashboard', icon: BarChart3, label: 'Ringkasan' },
+  { to: '/dashboard/cbam', icon: ShieldCheck, label: 'Laporan CBAM' },
   { to: '/dashboard/energy', icon: BatteryCharging, label: 'Pemantauan Energi' },
   { to: '/dashboard/carbon', icon: Leaf, label: 'MRV Karbon' },
-  { to: '/dashboard/cbam', icon: ShieldCheck, label: 'Kepatuhan CBAM' },
+  { to: '/dashboard/fuel', icon: Fuel, label: 'Bahan Bakar' },
   { to: '/dashboard/savings', icon: PiggyBank, label: 'Penghematan Energi' },
   { to: '/dashboard/insights', icon: Sparkles, label: 'Wawasan AI' },
   { to: '/dashboard/reports', icon: FileText, label: 'Laporan' },
@@ -70,6 +72,11 @@ const AppSidebar = ({ onNavigate, instanceId = 'desktop' }: AppSidebarProps) => 
                 )}
                 <item.icon size={20} className="relative z-10" />
                 <span className="relative z-10">{item.label}</span>
+                {item.to === '/dashboard/cbam' && (
+                  <span className="relative z-10 ml-auto rounded-full bg-primary-green/10 px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary-green">
+                    Utama
+                  </span>
+                )}
               </>
             )}
           </NavLink>

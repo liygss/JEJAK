@@ -1,0 +1,494 @@
+============================================================
+DOKUMEN PENDUKUNG BAB IV
+DAFTAR GAMBAR, FITUR DASHBOARD, DAN DATA KUNCI
+PLATFORM JEJAK
+============================================================
+
+Tujuan dokumen:
+Dokumen ini membantu penyusunan BAB IV (Hasil dan Pembahasan) dengan
+memetakan gambar, fitur dashboard, dan angka kunci yang benar-benar
+tersedia pada implementasi platform JEJAK.
+
+Catatan penting:
+- Seluruh angka pada dashboard bersifat ilustratif untuk demonstrasi.
+- Angka bukan data pengukuran resmi dan bukan dasar pelaporan regulasi.
+- Data contoh berada di src/data (energy.ts, carbon.ts, insights.ts, admin.ts, cbam.ts).
+- Tanggal acuan data contoh adalah 2025-10-09.
+- Filter "30 Hari Terakhir" pada Pabrik Manufaktur A memuat 20 catatan
+  energi dan 20 catatan karbon.
+
+
+============================================================
+BAGIAN 1. DAFTAR GAMBAR UNTUK BAB IV
+============================================================
+
+Gambar 4.1  Arsitektur Sistem JEJAK
+- Jenis        : Diagram buatan sendiri (bukan screenshot).
+- Isi          : Sumber data (meter/sensor/gateway) -> pengolahan data ->
+                 dashboard JEJAK Energy dan JEJAK Carbon -> laporan.
+- Sumber acuan : Alur Connect - Aggregate - Analyze - Report pada halaman
+                 landing, serta modul perangkat pada konsol admin.
+- Status       : Perlu dibuat ulang sebagai diagram.
+
+Gambar 4.2  Alur Pengolahan Data JEJAK
+- Jenis        : Diagram alur buatan sendiri (bukan screenshot).
+- Isi          : Pengumpulan data energi -> pemeriksaan dan pengolahan ->
+                 estimasi biaya listrik -> estimasi emisi karbon ->
+                 visualisasi dashboard -> ekspor laporan.
+- Status       : Perlu dibuat ulang sebagai diagram.
+
+Gambar 4.3  Halaman Utama Platform JEJAK
+- Jenis        : Screenshot halaman.
+- Route        : /
+- Aset siap pakai: public/Industrial IoT Dashboard Showcase.png
+- Alternatif   : Screenshot langsung halaman landing.
+- Keterangan   : Menampilkan identitas platform, ringkasan nilai energi dan
+                 karbon, serta alur kerja platform.
+
+Gambar 4.4  Dashboard Ringkasan Industri
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard
+- Isi          : Lima kartu KPI, skor efisiensi, jumlah pembacaan di atas
+                 baseline, hari puncak, grafik tren, wawasan AI, rincian
+                 energi, status perangkat, dan aktivitas terbaru.
+- Keterangan   : Gambar utama untuk menunjukkan integrasi JEJAK Energy dan
+                 JEJAK Carbon dalam satu tampilan.
+
+Gambar 4.5  Grafik Tren Energi dan Karbon
+- Jenis        : Screenshot komponen.
+- Route        : /dashboard (komponen EnergyCarbonChart)
+- Isi          : Grafik area dengan dua sumbu Y, garis baseline, serta mode
+                 tampilan Energi, Karbon, dan Gabungan.
+- Keterangan   : Menunjukkan hubungan antara konsumsi energi dan emisi.
+
+Gambar 4.6  Rincian Konsumsi Energi per Area
+- Jenis        : Screenshot komponen.
+- Route        : /dashboard (komponen EnergyBreakdown)
+- Isi          : Donut chart dan daftar area: Lini Produksi, HVAC,
+                 Pencahayaan, dan Utilitas beserta persentase dan biaya.
+- Keterangan   : Menunjukkan area dengan konsumsi energi terbesar.
+
+Gambar 4.7  Halaman Pemantauan Energi
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard/energy
+- Isi          : Tiga KPI (total konsumsi, rata-rata harian, total biaya),
+                 grafik pemakaian energi seiring waktu, dan tabel data.
+- Keterangan   : Representasi modul JEJAK Energy.
+
+Gambar 4.8  Tabel Data Konsumsi Energi
+- Jenis        : Screenshot komponen/tabel.
+- Route        : /dashboard/energy
+- Isi          : Kolom waktu, area, konsumsi, baseline, status, dan sumber
+                 data; dilengkapi pencarian, filter area, filter "di atas
+                 baseline", dan pengurutan kolom.
+- Keterangan   : Menunjukkan mekanisme pengolahan dan penelusuran data.
+
+Gambar 4.9  Halaman MRV Karbon
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard/carbon
+- Isi          : KPI total emisi, Scope 1, Scope 2, dan intensitas emisi.
+- Keterangan   : Representasi modul JEJAK Carbon dan dasar MRV.
+
+Gambar 4.10 Tren dan Komposisi Emisi Karbon
+- Jenis        : Screenshot komponen.
+- Route        : /dashboard/carbon
+- Isi          : Line chart tren emisi harian dan bar chart emisi per sumber.
+- Keterangan   : Menunjukkan pola emisi berdasarkan waktu dan sumber.
+
+Gambar 4.11 Tabel Data Karbon dan Ekspor CSV
+- Jenis        : Screenshot komponen/tabel.
+- Route        : /dashboard/carbon
+- Isi          : Kolom waktu, sumber, scope, emisi, dan status data
+                 (Tercatat/Estimasi), tombol "Buat Laporan" (CSV).
+- Keterangan   : Menunjukkan keterlacakan status data emisi.
+
+Gambar 4.12 Wawasan AI dan Tanya JEJAK
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard/insights
+- Isi          : Ringkasan wawasan, filter keparahan dan area, daftar
+                 rekomendasi, panel detail, tombol "Tandai Ditinjau", serta
+                 antarmuka tanya-jawab berbasis aturan.
+- Keterangan   : Menunjukkan fitur analisis dan rekomendasi operasional.
+
+Gambar 4.13 Kalkulator Penghematan Bersama
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard/savings
+- Isi          : KPI biaya energi, estimasi penghematan, kalkulator target
+                 penghematan dan porsi penyedia (model ESCO), tolok ukur, dan
+                 daftar peluang penghematan.
+- Keterangan   : Menunjukkan fitur pendukung pengambilan keputusan biaya.
+
+Gambar 4.14 Simulator Biaya dan Kesiapan CBAM (Opsional)
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard/cbam
+- Isi          : Simulator biaya per komoditas, grafik perbandingan, donut
+                 porsi eksposur, checklist kesiapan, ekspor PDF dan Excel.
+- Keterangan   : Fitur lanjutan; masukkan jika laporan membahas CBAM.
+
+Gambar 4.15 Halaman Laporan dan Ekspor
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard/reports
+- Isi          : Tiga template laporan (Energi, Karbon, Ringkasan
+                 Operasional), pustaka laporan, pratinjau, ekspor CSV/PDF.
+- Keterangan   : Menunjukkan fitur pelaporan dan ekspor data.
+
+Gambar 4.16 Pratinjau Laporan
+- Jenis        : Screenshot halaman.
+- Route        : /dashboard/reports/operational
+- Isi          : Dokumen laporan siap cetak dengan ringkasan metrik dan tabel.
+- Keterangan   : Menunjukkan keluaran akhir dari proses pengolahan data.
+
+Gambar 4.17 Konsol Admin Armada AIoT (Opsional)
+- Jenis        : Screenshot halaman.
+- Route        : /admin
+- Isi          : KPI perangkat aktif, ketersediaan, latensi, peringatan;
+                 grafik telemetri; status armada; distribusi tipe perangkat;
+                 dan aktivitas terbaru.
+- Keterangan   : Menunjukkan pemantauan perangkat sumber data.
+
+Gambar 4.18 Halaman Perangkat dan Perawatan (Opsional)
+- Jenis        : Screenshot halaman.
+- Route        : /admin/devices atau /admin/maintenance
+- Isi          : Daftar perangkat dengan sinyal, baterai, uptime, kualitas
+                 data; papan perawatan dengan prioritas Kritis, Terjadwal,
+                 dan Pantau.
+- Keterangan   : Mendukung pembahasan pengumpulan dan pemeliharaan data.
+
+Gambar 4.19 Perangkat Pemantauan IoT
+- Jenis        : Foto/aset.
+- Aset         : public/alat iot.jpeg
+- Keterangan   : Visual pendukung untuk sumber data energi.
+
+Gambar 4.20 Pemasangan Sensor pada Panel Listrik
+- Jenis        : Foto/aset.
+- Aset         : public/Smart IoT Monitoring in Electrical Cabinet.png
+- Keterangan   : Visual pendukung tahap input data pada arsitektur sistem.
+
+Aset visual lain yang tersedia:
+- public/jejak analysis.png
+- public/logo-jejak.jpeg
+- public/logo jejak.jpeg
+- public/Industrial IoT Dashboard Showcase.png
+
+
+============================================================
+BAGIAN 2. DAFTAR FITUR DASHBOARD
+============================================================
+
+2.1 Fitur Inti (wajib, sesuai JEJAK Energy dan JEJAK Carbon)
+
+A. Navigasi dan konteks data
+1. Menu samping: Ringkasan, Pemantauan Energi, MRV Karbon, Kepatuhan CBAM,
+   Penghematan Energi, Wawasan AI, Laporan, Pengaturan.
+2. Pemilihan pabrik: Pabrik Manufaktur A dan Pabrik Manufaktur B.
+3. Filter periode: 7 Hari, 30 Hari, dan 90 Hari Terakhir.
+4. Tombol muat ulang data dan indikator waktu pembaruan terakhir.
+5. Tombol ekspor ringkasan CSV pada header.
+6. Tampilan responsif untuk desktop dan mobile.
+
+B. Dashboard Ringkasan
+7. KPI Total Konsumsi Energi beserta tren dan sparkline.
+8. KPI Emisi Karbon beserta tren dan sparkline.
+9. KPI Biaya Energi beserta tren dan sparkline.
+10. KPI Potensi Penghematan Energi dari wawasan terbuka.
+11. KPI Estimasi Biaya Sudah Dihemat dibanding baseline.
+12. Skor efisiensi (persentase pembacaan dalam baseline).
+13. Jumlah pembacaan di atas baseline.
+14. Hari puncak konsumsi energi.
+15. Grafik Tren Energi dan Karbon dengan mode Energi, Karbon, dan Gabungan.
+16. Garis referensi rata-rata baseline pada grafik.
+17. Ringkasan rata-rata energi, rata-rata karbon, skor efisiensi, dan jumlah
+    hari di atas baseline.
+18. Panel Wawasan AI JEJAK dengan tombol "Tandai Ditinjau".
+19. Rincian Energi per area dalam bentuk donut chart.
+20. Status Perangkat Terhubung (Aktif, Peringatan, Mati).
+21. Aktivitas Terbaru (log sistem).
+
+C. Pemantauan Energi
+22. KPI Total Konsumsi Energi.
+23. KPI Rata-rata Pemakaian Harian.
+24. KPI Total Biaya Energi.
+25. Grafik Pemakaian Energi Seiring Waktu: konsumsi vs baseline.
+26. Tabel data konsumsi energi.
+27. Pencarian berdasarkan area atau tanggal.
+28. Filter area: Semua Area, Lini Produksi, HVAC, Pencahayaan, Utilitas.
+29. Filter hanya menampilkan data di atas baseline.
+30. Pengurutan tabel berdasarkan waktu, area, dan konsumsi.
+31. Indikator status "Di Atas Baseline" atau "Dalam Rentang".
+32. Kolom sumber data (IoT atau Input Manual).
+
+D. MRV Karbon
+33. KPI Total Emisi.
+34. KPI Scope 1 (emisi langsung).
+35. KPI Scope 2 (emisi tidak langsung dari energi yang dibeli).
+36. KPI Intensitas Emisi (tCO2e per hari).
+37. Grafik Tren Emisi harian.
+38. Grafik Emisi per Sumber.
+39. Tabel data karbon: waktu, sumber, scope, emisi, status data.
+40. Status data Tercatat atau Estimasi.
+41. Pencarian data karbon.
+42. Ekspor laporan karbon ke CSV.
+
+E. Wawasan AI
+43. Ringkasan jumlah wawasan terbuka dan total wawasan.
+44. Distribusi keparahan: Tinggi, Sedang, Rendah.
+45. Estimasi total penghematan dari wawasan.
+46. Jumlah wawasan yang sudah ditinjau.
+47. Filter wawasan berdasarkan keparahan.
+48. Filter wawasan berdasarkan area.
+49. Daftar wawasan operasional dengan deskripsi dan estimasi dampak.
+50. Panel detail wawasan berisi ringkasan, data pendukung, dan tindakan
+    yang disarankan.
+51. Tombol "Tandai Ditinjau" pada wawasan.
+52. Antarmuka tanya-jawab "Tanya JEJAK" berbasis aturan.
+53. Pertanyaan yang disarankan (area konsumsi terbesar, peluang penghematan,
+    perubahan emisi karbon).
+54. Tautan cepat membuat laporan ringkasan operasional.
+
+F. Penghematan Energi
+55. KPI Biaya Energi periode terpilih.
+56. KPI Estimasi Penghematan.
+57. KPI Sinyal Peluang dan Wawasan Terbuka.
+58. Kalkulator penghematan bersama model ESCO.
+59. Input biaya energi tahunan yang terisi otomatis dari periode terpilih.
+60. Pengaturan target penghematan (slider dan pilihan 2%, 3%, 5%, 8%, 10%).
+61. Pengaturan porsi penyedia atas penghematan.
+62. Hasil perhitungan: total penghematan, porsi pengguna, porsi penyedia.
+63. Tolok ukur penghematan: kondisi saat ini, target, dan rentang praktik
+    terbaik.
+64. Daftar peluang penghematan beserta estimasi nilai.
+65. Tautan menuju halaman Wawasan AI.
+
+G. Pelaporan dan Ekspor
+66. Tiga template laporan: Laporan Konsumsi Energi, Laporan Emisi Karbon,
+    dan Ringkasan Operasional.
+67. Pustaka laporan dengan pencarian dan filter jenis laporan.
+68. Informasi periode, jumlah catatan, tanggal dibuat, dan status laporan.
+69. Pratinjau laporan sebelum diunduh.
+70. Ekspor laporan ke CSV.
+71. Ekspor laporan ke PDF.
+72. Tampilan cetak laporan (print).
+73. Ekspor ringkasan CSV langsung dari header dashboard.
+
+H. Pengaturan
+74. Profil pengguna dan peran operator.
+75. Ringkasan pabrik aktif dan periode pemantauan.
+76. Pengaturan notifikasi: ringkasan email harian, peringatan anomali,
+    laporan mingguan.
+77. Integrasi sumber data: Gateway IoT, SCADA Plant, ERP Keuangan.
+78. Ringkasan konfigurasi sistem: pabrik, periode, sumber data, status data.
+
+2.2 Fitur Pendukung (opsional)
+
+A. Kepatuhan CBAM
+79. Simulator biaya CBAM per komoditas (Baja, Semen, Aluminium primer).
+80. Input volume tahunan dan intensitas emisi tersemat.
+81. Perhitungan biaya per ton, biaya per tCO2e, biaya per bulan.
+82. Grafik perbandingan biaya antar komoditas.
+83. Donut porsi eksposur komoditas terpilih.
+84. Checklist kesiapan CBAM: status declarant, sistem MRV, catatan emisi,
+    jadwal pelaporan.
+85. Indikator progres kesiapan (Siap, Dalam proses, Belum siap).
+86. Ekspor laporan CBAM ke PDF.
+87. Ekspor Excel menggunakan template resmi UE
+    (public/templates/cbam-installations-2024-12-13.xlsx).
+
+B. Konsol Admin Armada AIoT
+88. KPI perangkat aktif, rata-rata ketersediaan, rata-rata latensi,
+    dan peringatan terbuka.
+89. Grafik telemetri: laju data 24 jam dan ketersediaan 30 hari.
+90. Donut status armada: Aktif, Peringatan, Mati, Perawatan.
+91. Bar chart distribusi perangkat per tipe.
+92. Umpan aktivitas admin.
+93. Daftar perangkat dengan pencarian, filter status, dan pengurutan.
+94. Detail perangkat: sinyal, baterai, uptime 7 hari, kualitas data,
+    firmware, latensi, dan packet loss.
+95. Peringatan perangkat dengan filter keparahan dan acknowledge.
+96. Linimasa peringatan dan progres penanganan.
+97. Papan perawatan dengan prioritas Kritis, Terjadwal, dan Pantau.
+98. Filter lokasi perangkat pada papan perawatan.
+99. KPI antrean perawatan, perangkat kritis, rata-rata ketersediaan,
+    dan estimasi durasi total.
+100. Tombol menandai perintah kerja selesai.
+
+
+============================================================
+BAGIAN 3. DATA KUNCI UNTUK NARASI HASIL
+============================================================
+
+Konteks: Pabrik Manufaktur A, periode 30 Hari Terakhir.
+
+A. Ringkasan energi
+- Total konsumsi energi        : 391,5 MWh
+- Total biaya energi           : Rp 587.250.000
+- Rata-rata pemakaian harian   : 19,58 MWh (391,5 MWh / 20 hari data)
+- Skor efisiensi               : 20%
+- Pembacaan di atas baseline   : 16 dari 20 catatan
+- Hari puncak                  : 34,6 MWh pada 2025-09-23
+- Estimasi sudah dihemat       : Rp 1.350.000
+- Potensi penghematan          : Rp 19.800.000
+
+B. Komposisi energi per area
+- Lini Produksi : 222,6 MWh (56,9%)
+- HVAC          : 81,8 MWh (20,9%)
+- Utilitas      : 61,8 MWh (15,8%)
+- Pencahayaan   : 25,3 MWh (6,5%)
+
+C. Ringkasan karbon
+- Total emisi          : 215,1 tCO2e
+- Scope 1              : 0 tCO2e
+- Scope 2              : 215,1 tCO2e
+- Intensitas emisi     : 10,76 tCO2e/hari
+- Jumlah hari data     : 20 hari
+
+D. Pembanding Pabrik Manufaktur B (30 Hari Terakhir)
+- Total konsumsi energi : 382,7 MWh
+- Total biaya energi    : Rp 581.704.000
+- Total emisi karbon    : 210,5 tCO2e
+
+E. Wawasan AI (data contoh)
+- Potensi Pemborosan Energi   : keparahan Tinggi, Lini Produksi,
+                                estimasi Rp 9.200.000
+- Peluang Operasional         : keparahan Sedang, Lini Produksi,
+                                estimasi Rp 6.400.000
+- Peringatan Karbon           : keparahan Sedang, HVAC,
+                                estimasi Rp 3.000.000
+- Optimalisasi Pencahayaan    : keparahan Rendah, Pencahayaan,
+                                estimasi Rp 1.200.000
+- Total estimasi penghematan  : Rp 19.800.000
+
+F. Perangkat (data contoh)
+- Total perangkat      : 15
+- Status Aktif         : 5
+- Status Peringatan    : 6
+- Status Mati          : 2
+- Status Perawatan     : 2
+- Jumlah peringatan    : 5
+- Tipe perangkat       : Meter, Sensor, Gateway, HVAC, PLC
+
+G. Contoh perhitungan CBAM (opsional)
+- Komoditas            : Baja
+- Volume               : 1.000 ton
+- Tarif referensi      : EUR 140 per ton
+- Biaya estimasi       : EUR 140.000
+- Kurs referensi       : EUR 1 = Rp 17.000
+- Biaya estimasi IDR   : Rp 2.380.000.000
+- Intensitas tersemat  : 1,9 tCO2e per ton
+- Emisi tersemat       : 1.900 tCO2e
+- Biaya per tCO2e      : sekitar Rp 1.252.632
+
+
+============================================================
+BAGIAN 4. PEMETAAN FITUR KE SUBBAB BAB IV
+============================================================
+
+4.1 Perancangan Sistem JEJAK
+- 4.1.1 Arsitektur Sistem
+  Gunakan Gambar 4.1. Tekankan alur input data (meter/sensor/gateway),
+  pemrosesan, dan visualisasi pada dashboard.
+- 4.1.2 Perancangan Modul JEJAK Energy
+  Gunakan fitur: KPI energi, tren konsumsi, estimasi biaya listrik,
+  indikator anomali/di atas baseline, rincian per area, dan tabel data.
+  Gambar pendukung: 4.6, 4.7, 4.8.
+- 4.1.3 Perancangan Modul JEJAK Carbon
+  Gunakan fitur: total emisi, Scope 1 dan Scope 2, tren emisi, emisi per
+  sumber, intensitas emisi, dan status data.
+  Gambar pendukung: 4.9, 4.10, 4.11.
+
+4.2 Mekanisme Pengolahan Data
+- 4.2.1 Pengumpulan Data Energi
+  Gunakan Gambar 4.19 dan 4.20 serta fitur status perangkat dan sumber data.
+- 4.2.2 Pengolahan Konsumsi Energi
+  Gunakan fitur pembersihan/penyelarasan data, baseline, skor efisiensi,
+  agregasi harian, dan filter periode.
+- 4.2.3 Estimasi Biaya Listrik
+  Gunakan fitur total biaya energi, tarif efektif, dan kalkulator penghematan.
+  Gambar pendukung: 4.13.
+- 4.2.4 Estimasi Emisi Karbon
+  Gunakan fitur Scope 2, intensitas emisi, dan faktor emisi terkonfigurasi.
+  Jelaskan bahwa hasil bersifat estimasi.
+- 4.2.5 Visualisasi Data pada Dashboard
+  Gunakan Gambar 4.2, 4.4, dan 4.5. Tekankan integrasi energi, biaya, dan
+  karbon dalam satu tampilan.
+
+4.3 Implementasi Minimum Viable Product (MVP)
+- Fitur inti MVP: dashboard ringkasan, pemantauan energi, MRV karbon,
+  wawasan AI, penghematan energi, laporan, dan pengaturan.
+- Fitur pendukung: CBAM dan konsol admin (opsional).
+- Gunakan tabel fitur pada Bagian 2 sebagai dasar tabel implementasi MVP.
+- Gunakan angka pada Bagian 3 sebagai bukti implementasi dan pembahasan.
+- Gambar pendukung: 4.3 sampai 4.18.
+
+Contoh tabel implementasi MVP:
+No | Fitur | Modul | Status | Gambar
+1  | Dashboard ringkasan | Energy & Carbon | Terimplementasi | 4.4
+2  | Pemantauan energi | JEJAK Energy | Terimplementasi | 4.7
+3  | MRV karbon | JEJAK Carbon | Terimplementasi | 4.9
+4  | Estimasi biaya | JEJAK Energy | Terimplementasi | 4.13
+5  | Wawasan AI | Pendukung | Terimplementasi | 4.12
+6  | Laporan CSV/PDF | Pendukung | Terimplementasi | 4.15
+7  | CBAM | Pendukung | Opsional | 4.14
+8  | Konsol admin | Pendukung | Opsional | 4.17
+
+
+============================================================
+BAGIAN 5. CARA MENGAMBIL SCREENSHOT
+============================================================
+
+1. Jalankan aplikasi:
+   npm install
+   npm run dev
+
+2. Buka http://localhost:5173 pada browser.
+
+3. Atur konteks data:
+   - Pilih Pabrik Manufaktur A.
+   - Pilih periode 30 Hari Terakhir.
+   - Tunggu indikator pembaruan selesai.
+
+4. Ambil screenshot setiap route berikut:
+   - /                          -> Gambar 4.3
+   - /dashboard                 -> Gambar 4.4, 4.5, 4.6
+   - /dashboard/energy          -> Gambar 4.7, 4.8
+   - /dashboard/carbon          -> Gambar 4.9, 4.10, 4.11
+   - /dashboard/insights        -> Gambar 4.12
+   - /dashboard/savings         -> Gambar 4.13
+   - /dashboard/cbam            -> Gambar 4.14 (opsional)
+   - /dashboard/reports         -> Gambar 4.15
+   - /dashboard/reports/operational -> Gambar 4.16
+   - /admin                     -> Gambar 4.17 (opsional)
+   - /admin/devices             -> Gambar 4.18 (opsional)
+   - /admin/maintenance         -> Gambar 4.18 (opsional)
+   - /dashboard/settings        -> pelengkap (opsional)
+
+5. Gunakan resolusi lebar minimal 1440 px agar tabel dan grafik terbaca.
+
+6. Untuk Gambar 4.3 dan 4.20, aset sudah tersedia di folder public/
+   dan dapat langsung disalin ke dokumen laporan.
+
+7. Jangan menampilkan data pribadi atau kredensial pada screenshot.
+   Data pada aplikasi merupakan data contoh.
+
+
+============================================================
+BAGIAN 6. CATATAN PENULISAN
+============================================================
+
+- Sebutkan bahwa angka pada dashboard merupakan data ilustratif.
+- Hindari menyatakan hasil sebagai emisi terukur resmi.
+- Jelaskan bahwa hasil estimasi biaya dan emisi dapat berbeda dari tagihan
+  atau laporan resmi karena perbedaan tarif, komponen biaya, faktor emisi,
+  wilayah, dan periode.
+- Untuk CBAM, tegaskan bahwa perhitungan hanya ilustratif dan bukan nasihat
+  hukum, pajak, atau kepatuhan.
+- Gunakan istilah yang konsisten:
+  * "estimasi" untuk biaya dan emisi,
+  * "baseline" untuk nilai acuan,
+  * "wawasan" untuk insight,
+  * "Pabrik Manufaktur A/B" untuk plant.
+- Cantumkan sumber data contoh pada lampiran atau catatan kaki:
+  src/data/energy.ts, carbon.ts, insights.ts, admin.ts, dan cbam.ts.
+
+============================================================
+AKHIR DOKUMEN
+============================================================

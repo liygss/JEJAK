@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Settings as SettingsIcon,
   Factory,
@@ -9,11 +10,14 @@ import {
   Plug,
   User,
   Check,
+  Radio,
+  RefreshCw,
 } from 'lucide-react'
 import AppHeader from '../components/layout/AppHeader'
 import { useSidebar } from '../components/layout/DashboardLayout'
 import { useFilters } from '../lib/FiltersContext'
 import { useToast } from '../components/ui/Toast'
+import { NODE_INTERVAL_OPTIONS, useNodeReport } from '../lib/NodeReportContext'
 import { Reveal, Stagger, StaggerItem } from '../components/ui/Reveal'
 import { PLANT_LABEL, PERIOD_LABEL } from '../lib/id'
 
@@ -35,13 +39,18 @@ const SettingsPage = () => {
   const { openSidebar } = useSidebar()
   const { plant, period } = useFilters()
   const { toast } = useToast()
+  const { snapshot, history, autoEnabled, setAutoEnabled, intervalMs, setIntervalMs, syncNow } = useNodeReport()
   const [toggles, setToggles] = useState<Record<string, boolean>>(
     Object.fromEntries(NOTIFICATIONS.map((n) => [n.id, n.defaultOn]))
   )
 
   const flip = (t: Toggle) => {
-    const next = !toggles[t.id]
-    setToggles((prev) => ({ ...prev, [t.id]: next }))
+    const next = t.id === 'report' ? !autoEnabled : !toggles[t.id]
+    if (t.id === 'report') {
+      setAutoEnabled(next)
+    } else {
+      setToggles((prev) => ({ ...prev, [t.id]: next }))
+    }
     toast({
       title: next ? 'Pengaturan diaktifkan' : 'Pengaturan dinonaktifkan',
       description: `${t.label} ${next ? 'aktif' : 'nonaktif'}.`,
@@ -119,7 +128,7 @@ const SettingsPage = () => {
               </div>
               <div className="divide-y divide-border">
                 {NOTIFICATIONS.map((n) => {
-                  const on = toggles[n.id]
+                  const on = n.id === 'report' ? autoEnabled : toggles[n.id]
                   return (
                     <div key={n.id} className="flex items-center justify-between gap-4 py-3">
                       <div className="min-w-0">
@@ -194,6 +203,69 @@ const SettingsPage = () => {
             </div>
           </Reveal>
         </div>
+
+        <Reveal>
+          <div className="rounded-18 border border-primary-green/20 bg-gradient-to-br from-soft-mint/60 via-surface to-surface p-5 shadow-sm md:p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-10 bg-white text-primary-green shadow-sm">
+                <Radio size={18} />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-main-text">Laporan CBAM otomatis dari node</h3>
+                <p className="text-xs text-secondary-text">Sinkronisasi telemetri dan histori laporan disimpan di browser</p>
+              </div>
+            </div>
+            <div className="grid gap-3 text-xs text-secondary-text sm:grid-cols-3">
+              <div className="rounded-12 border border-border bg-surface p-3">
+                <p className="font-medium text-main-text">Sumber node</p>
+                <p className="mt-1">{snapshot.sourceLabel}</p>
+              </div>
+              <div className="rounded-12 border border-border bg-surface p-3">
+                <p className="font-medium text-main-text">Sinkron terakhir</p>
+                <p className="mt-1">{snapshot.generatedAt}</p>
+              </div>
+              <div className="rounded-12 border border-border bg-surface p-3">
+                <p className="font-medium text-main-text">Histori tersimpan</p>
+                <p className="mt-1">{history.length} laporan • {snapshot.deviceCount} perangkat</p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <label htmlFor="node-interval" className="text-xs font-medium text-main-text">
+                Interval simulasi
+              </label>
+              <select
+                id="node-interval"
+                value={intervalMs}
+                onChange={(e) => setIntervalMs(Number(e.target.value))}
+                className="rounded-12 border border-border bg-surface px-3 py-2 text-xs text-main-text focus:border-primary-green focus:outline-none"
+              >
+                {NODE_INTERVAL_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => {
+                  syncNow()
+                  toast({ title: 'Sinkron node selesai', description: 'Snapshot laporan terbaru dibuat.', variant: 'success' })
+                }}
+                className="inline-flex items-center gap-1.5 rounded-12 bg-primary-green px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-deep-teal"
+              >
+                <RefreshCw size={13} /> Sinkron sekarang
+              </button>
+              <Link
+                to="/dashboard/cbam"
+                className="inline-flex items-center gap-1.5 rounded-12 border border-primary-green/30 bg-soft-mint/60 px-3 py-2 text-xs font-medium text-primary-green transition-colors hover:bg-soft-mint"
+              >
+                Buka laporan
+              </Link>
+            </div>
+            <p className="mt-3 text-[11px] leading-relaxed text-secondary-text">
+              Otomatis berjalan saat halaman web terbuka dan toggle “Laporan mingguan” aktif. Nilai telemetri dan konversi bersifat ilustratif.
+            </p>
+          </div>
+        </Reveal>
 
         {/* Read-only config summary */}
         <Reveal>

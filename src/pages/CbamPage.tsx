@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ShieldCheck,
   Globe,
@@ -19,6 +19,9 @@ import {
   Coins,
   CalendarClock,
   FileSpreadsheet,
+  RefreshCw,
+  Radio,
+  History,
 } from 'lucide-react'
 import {
   BarChart,
@@ -40,15 +43,14 @@ import CalculationResult from '../components/ui/CalculationResult'
 import { Stagger, StaggerItem, Reveal } from '../components/ui/Reveal'
 import { useToast } from '../components/ui/Toast'
 import { useFilters } from '../lib/FiltersContext'
-import { carbonRecords } from '../data/carbon'
-import { energyRecords } from '../data/energy'
+import { useNodeReport, type NodeHistoryEntry } from '../lib/NodeReportContext'
 import { calculateTotalCarbon } from '../lib/calculations'
 import { formatCurrencyIDR, formatCurrencyIDRCompact, formatTCO2e, formatNumber } from '../lib/formatters'
 import { downloadPdf } from '../lib/pdf'
 import { buildCbamExportData } from '../lib/cbamData'
-import { generateCbamExcel } from '../lib/cbamExcel'
 import {
   cbamCommodities,
+  cbamSectors,
   getCommodity,
   estimateCbamCostEur,
   readinessChecklist,
@@ -56,22 +58,52 @@ import {
   CBAM_DISCLAIMER,
 } from '../data/cbam'
 import { READINESS_LABEL, T } from '../lib/id'
+import { usePageMeta } from '../lib/usePageMeta'
 
 const CHART_COLORS = ['#059669', '#14B8A6', '#0F766E']
 const MUTED_BAR = '#CBD5E1'
+const CHECKLIST_STORAGE_KEY = 'jejak-cbam-checklist'
+
+function readChecklist(): Record<string, boolean> {
+  try {
+    const raw = window.localStorage.getItem(CHECKLIST_STORAGE_KEY)
+    return raw ? (JSON.parse(raw) as Record<string, boolean>) : {}
+  } catch {
+    return {}
+  }
+}
 
 const CbamPage = () => {
+  usePageMeta(
+    'Laporan CBAM — JEJAK',
+    'Simulasi biaya CBAM, daftar periksa kesiapan, dan ekspor laporan PDF serta template Excel UE dari data energi dan emisi industri.'
+  )
   const { openSidebar } = useSidebar()
   const { toast } = useToast()
   const navigate = useNavigate()
   const { plant, period, filterCarbon, filterEnergy } = useFilters()
+  const { snapshot, history, autoEnabled, syncNow } = useNodeReport()
 
-  const [commodityId, setCommodityId] = useState(cbamCommodities[0].id)
-  const [tonnes, setTonnes] = useState(cbamCommodities[0].defaultTonnes)
-  const [intensity, setIntensity] = useState(cbamCommodities[0].defaultEmbeddedIntensity)
-  const [checked, setChecked] = useState<Record<string, boolean>>({})
+  const [overrides, setOverrides] = useState<{
+    commodityId?: string
+    tonnes?: number
+    intensity?: number
+  }>({})
+  const [checked, setChecked] = useState<Record<string, boolean>>(readChecklist)
   const [exporting, setExporting] = useState(false)
   const [exportingExcel, setExportingExcel] = useState(false)
+
+  const commodityId = overrides.commodityId ?? snapshot.commodityId
+  const tonnes = overrides.tonnes ?? snapshot.tonnes
+  const intensity = overrides.intensity ?? snapshot.intensity
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(checked))
+    } catch {
+      return
+    }
+  }, [checked])
 
   const commodity = getCommodity(commodityId)
   const costEur = estimateCbamCostEur(commodity.ratePerTonneEur, tonnes)
@@ -100,8 +132,8 @@ const CbamPage = () => {
   )
 
   const monitoredEmissions = useMemo(
-    () => calculateTotalCarbon(filterCarbon(carbonRecords)),
-    [filterCarbon]
+    () => calculateTotalCarbon(filterCarbon(snapshot.carbonRecords)),
+    [filterCarbon, snapshot]
   )
 
   const completed = readinessChecklist.filter((i) => checked[i.id]).length
@@ -121,31 +153,61 @@ const CbamPage = () => {
 
   const handleCommodity = (id: string) => {
     const c = getCommodity(id)
-    setCommodityId(c.id)
-    setTonnes(c.defaultTonnes)
-    setIntensity(c.defaultEmbeddedIntensity)
+    setOverrides((prev) => ({
+      ...prev,
+      commodityId: c.id,
+      tonnes: c.defaultTonnes,
+      intensity: c.defaultEmbeddedIntensity,
+    }))
   }
 
-  const buildExportData = () =>
-    buildCbamExportData(
-      plant,
-      period,
-      commodity,
-      tonnes,
-      intensity,
-      filterEnergy(energyRecords),
-      filterCarbon(carbonRecords),
-      checked,
-      readinessChecklist
-    )
+  const syncFromNode = () => {
+    syncNow()
+    setOverrides({})
+    toast({ title: 'Data node tersinkron', description: 'Nilai CBAM dikembalikan ke telemetri node terbaru.', variant: 'success' })
+  }
+
+  const exportData = buildCbamExportData(
+    plant,
+    period,
+    commodity,
+    tonnes,
+    intensity,
+    filterEnergy(snapshot.energyRecords),
+    filterCarbon(snapshot.carbonRecords),
+    checked,
+    readinessChecklist
+  )
+
+  const downloadHistoryPdf = async (entry: NodeHistoryEntry) => {
+    try {
+      const { default: CbamPdfDocument } = await import('../components/reports/CbamPdfDocument')
+      const data = buildCbamExportData(
+        snapshot.plant,
+        period,
+        getCommodity(entry.commodityId),
+        entry.tonnes,
+        entry.intensity,
+        filterEnergy(snapshot.energyRecords),
+        filterCarbon(snapshot.carbonRecords),
+        checked,
+        readinessChecklist
+      )
+      await downloadPdf(<CbamPdfDocument data={data} />, `jejak_cbam_node_${entry.id.slice(0, 10)}.pdf`)
+      toast({ title: 'PDF riwayat siap', variant: 'success' })
+    } catch (err) {
+      console.error(err)
+      toast({ title: 'PDF gagal', description: 'Tidak dapat membuat PDF dari riwayat node.', variant: 'warning' })
+    }
+  }
 
   const exportExcel = async () => {
     if (exportingExcel) return
     setExportingExcel(true)
     try {
-      const data = buildExportData()
-      await generateCbamExcel(data)
-      toast({ title: 'Excel Siap', description: 'Template resmi CBAM terisi berhasil diunduh.', variant: 'success' })
+      const { generateCbamExcel } = await import('../lib/cbamExcel')
+      await generateCbamExcel(exportData)
+      toast({ title: 'Excel Siap', description: 'Template UE CBAM terisi sebagian berhasil diunduh.', variant: 'success' })
     } catch (err) {
       console.error(err)
       toast({ title: 'Gagal Ekspor Excel', description: 'Terjadi kesalahan saat mengisi template.', variant: 'warning' })
@@ -159,8 +221,7 @@ const CbamPage = () => {
     setExporting(true)
     try {
       const { default: CbamPdfDocument } = await import('../components/reports/CbamPdfDocument')
-      const data = buildExportData()
-      await downloadPdf(<CbamPdfDocument data={data} />, `jejak_cbam_report_${commodity.id}.pdf`)
+      await downloadPdf(<CbamPdfDocument data={exportData} />, `jejak_cbam_report_${commodity.id}.pdf`)
       toast({ title: 'PDF siap', description: 'Unduhan laporan komprehensif CBAM dimulai.', variant: 'success' })
     } catch (err) {
       console.error(err)
@@ -173,8 +234,8 @@ const CbamPage = () => {
   return (
     <>
       <AppHeader
-        title="Kepatuhan CBAM"
-        subtitle="Estimasi eksposur dan pantau kesiapan"
+        title="Laporan & Kepatuhan CBAM"
+        subtitle="Simulasi eksposur, kesiapan, dan ekspor laporan"
         onMenuClick={openSidebar}
       />
       <main className="space-y-6 p-4 md:p-6">
@@ -200,6 +261,10 @@ const CbamPage = () => {
                   <span className="font-medium text-main-text"> Deklaran CBAM yang Berwenang </span>
                   yang boleh mengimpor barang yang tercakup ke UE. Estimasi eksposur dan pantau data
                   yang Anda perlukan untuk pelaporan.
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-secondary-text">
+                  Cakupan sektor UE: {cbamSectors.join(' • ')}. Simulasi ini menyediakan opsi komoditas
+                  ilustratif untuk sebagian sektor; sektor lain tetap tercantum sebagai referensi cakupan.
                 </p>
               </div>
             </div>
@@ -283,6 +348,25 @@ const CbamPage = () => {
               </div>
             </div>
 
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-12 border border-primary-green/20 bg-soft-mint/40 px-3 py-2 text-[11px] leading-relaxed text-secondary-text">
+              <span className="flex items-center gap-1.5">
+                <Radio size={14} className="shrink-0 text-primary-green" />
+                {snapshot.sourceLabel} • sinkron {snapshot.generatedAt}
+                <span className="font-medium text-main-text">
+                  {autoEnabled ? '(otomatis aktif)' : '(otomatis nonaktif)'}
+                </span>
+              </span>
+              <button
+                onClick={syncFromNode}
+                className="inline-flex items-center gap-1.5 rounded-10 border border-primary-green/30 bg-surface px-2.5 py-1 font-medium text-primary-green transition-colors hover:bg-soft-mint"
+              >
+                <RefreshCw size={12} /> Sinkron dari node
+              </button>
+            </div>
+            <p className="mb-3 px-1 text-[11px] text-secondary-text">
+              Nilai di bawah terisi otomatis dari telemetri node. Ubah salah satu input untuk menimpa nilai node.
+            </p>
+
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
                 <label htmlFor="cbam-commodity" className="mb-1.5 block text-xs font-medium text-secondary-text">
@@ -310,7 +394,9 @@ const CbamPage = () => {
                   type="number"
                   min={0}
                   value={tonnes}
-                  onChange={(e) => setTonnes(Math.max(0, Number(e.target.value) || 0))}
+                  onChange={(e) =>
+                    setOverrides((prev) => ({ ...prev, tonnes: Math.max(0, Number(e.target.value) || 0) }))
+                  }
                   className="w-full rounded-12 border border-border px-3 py-2 text-sm text-main-text focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
                 />
               </div>
@@ -324,7 +410,9 @@ const CbamPage = () => {
                   min={0}
                   step={0.1}
                   value={intensity}
-                  onChange={(e) => setIntensity(Math.max(0, Number(e.target.value) || 0))}
+                  onChange={(e) =>
+                    setOverrides((prev) => ({ ...prev, intensity: Math.max(0, Number(e.target.value) || 0) }))
+                  }
                   className="w-full rounded-12 border border-border px-3 py-2 text-sm text-main-text focus:border-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green/20"
                 />
               </div>
@@ -336,7 +424,7 @@ const CbamPage = () => {
               max={sliderMax}
               step={50}
               value={Math.min(tonnes, sliderMax)}
-              onChange={(e) => setTonnes(Number(e.target.value))}
+              onChange={(e) => setOverrides((prev) => ({ ...prev, tonnes: Number(e.target.value) }))}
               className="mt-5 w-full accent-[var(--color-primary-green)]"
               aria-label="Penggeser volume"
             />
@@ -359,6 +447,18 @@ const CbamPage = () => {
                 ]}
               />
               <p className="mt-2 px-1 text-[11px] leading-relaxed text-secondary-text">{commodity.note}</p>
+              <div className="mt-3 rounded-12 border border-border bg-main-bg p-3 text-[11px] leading-relaxed text-secondary-text">
+                <p className="font-semibold text-main-text">Transparansi perhitungan</p>
+                <p className="mt-1">
+                  Periode laporan contoh: {exportData.reportingPeriod} • ID instalasi: {exportData.installationId}
+                </p>
+                {exportData.formula.map((item) => (
+                  <p key={item.label} className="mt-1">
+                    <span className="font-medium text-main-text">{item.label}:</span> {item.value}
+                  </p>
+                ))}
+                <p className="mt-1">{exportData.verifier} • {exportData.defaultValuesNote}</p>
+              </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -597,6 +697,56 @@ const CbamPage = () => {
                 kewajiban Anda dengan Komisi Eropa dan penasihat yang berkualifikasi.
               </span>
             </div>
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div className="rounded-18 border border-border bg-surface p-4 shadow-sm md:p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-10 bg-soft-mint text-primary-green">
+                <History size={18} />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-main-text">Riwayat laporan otomatis dari node</h3>
+                <p className="text-xs text-secondary-text">
+                  Sinkronisasi periodik disimpan di browser • {history.length} entri terakhir
+                </p>
+              </div>
+            </div>
+
+            {history.length === 0 ? (
+              <p className="rounded-12 border border-border bg-main-bg p-4 text-sm text-secondary-text">
+                Belum ada riwayat. Tekan “Sinkron dari node” atau aktifkan otomatis di Pengaturan.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {history.map((entry) => {
+                  const entryCommodity = getCommodity(entry.commodityId)
+                  const exposure = entryCommodity.ratePerTonneEur * entry.tonnes * EUR_TO_IDR
+                  return (
+                    <div
+                      key={entry.id}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-12 border border-border bg-main-bg/50 px-3 py-2.5"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-main-text">
+                          {entry.generatedAt} • {entryCommodity.name}
+                        </p>
+                        <p className="text-[11px] text-secondary-text">
+                          {entry.tonnes.toLocaleString('id-ID')} ton • {entry.intensity.toFixed(2)} tCO₂e/t • {entry.deviceCount} perangkat • {formatCurrencyIDRCompact(exposure)}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => void downloadHistoryPdf(entry)}
+                        className="inline-flex items-center gap-1.5 rounded-10 border border-primary-green/30 bg-surface px-2.5 py-1.5 text-xs font-medium text-primary-green transition-colors hover:bg-soft-mint"
+                      >
+                        <FileText size={13} /> Unduh PDF
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </Reveal>
 

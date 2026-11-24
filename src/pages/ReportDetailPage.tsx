@@ -6,9 +6,9 @@ import { useSidebar } from '../components/layout/DashboardLayout'
 import ReportDocument from '../components/reports/ReportDocument'
 import { downloadPdf } from '../lib/pdf'
 import { useFilters } from '../lib/FiltersContext'
+import { useCombinedCarbon } from '../lib/FuelLogContext'
 import { useToast } from '../components/ui/Toast'
 import { energyRecords } from '../data/energy'
-import { carbonRecords } from '../data/carbon'
 import { insights } from '../data/insights'
 import { buildCsv, getTemplate, type ReportSlug } from '../data/reports'
 import { PLANT_LABEL } from '../lib/id'
@@ -20,6 +20,7 @@ const ReportDetailPage = () => {
   const { openSidebar } = useSidebar()
   const { filterEnergy, filterCarbon, plant, period } = useFilters()
   const { toast } = useToast()
+  const combinedCarbon = useCombinedCarbon()
 
   const [generating, setGenerating] = useState(false)
 
@@ -51,7 +52,7 @@ const ReportDetailPage = () => {
 
   const reportSlug = slug as ReportSlug
   const energy = filterEnergy(energyRecords)
-  const carbon = filterCarbon(carbonRecords)
+  const carbon = filterCarbon(combinedCarbon)
 
   const handleDownload = () => {
     const rows = buildCsv(reportSlug, plant, period, energy, carbon, insights)

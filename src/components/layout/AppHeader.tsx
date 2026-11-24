@@ -3,7 +3,7 @@ import { Menu, Download, User, ChevronDown, RefreshCw, ArrowLeftRight, Shield } 
 import { useFilters, type PeriodOption, type PlantOption } from '../../lib/FiltersContext'
 import { useToast } from '../ui/Toast'
 import { energyRecords } from '../../data/energy'
-import { carbonRecords } from '../../data/carbon'
+import { useCombinedCarbon } from '../../lib/FuelLogContext'
 import {
   calculateTotalCarbon,
   calculateTotalCost,
@@ -24,10 +24,11 @@ const periods: PeriodOption[] = PERIOD_OPTIONS
 const AppHeader = ({ title, subtitle, onMenuClick, role = 'user' }: AppHeaderProps) => {
   const { plant, setPlant, period, setPeriod, filterEnergy, filterCarbon, loading, refresh, lastUpdated } = useFilters()
   const { toast } = useToast()
+  const combinedCarbon = useCombinedCarbon()
 
   const handleExport = () => {
     const energy = filterEnergy(energyRecords)
-    const carbon = filterCarbon(carbonRecords)
+    const carbon = filterCarbon(combinedCarbon)
     const rows = [
       ['Ekspor Ringkasan JEJAK'],
       ['Pabrik', PLANT_LABEL[plant]],
@@ -37,6 +38,8 @@ const AppHeader = ({ title, subtitle, onMenuClick, role = 'user' }: AppHeaderPro
       ['Metrik', 'Nilai'],
       ['Total Energi (MWh)', calculateTotalEnergy(energy).toFixed(2)],
       ['Total Karbon (tCO2e)', calculateTotalCarbon(carbon).toFixed(2)],
+      ['Scope 1 - Bahan Bakar (tCO2e)', carbon.filter((r) => r.scope === 'Scope 1').reduce((sum, r) => sum + r.emissionsTCO2e, 0).toFixed(2)],
+      ['Scope 2 - Energi Dibeli (tCO2e)', carbon.filter((r) => r.scope === 'Scope 2').reduce((sum, r) => sum + r.emissionsTCO2e, 0).toFixed(2)],
       ['Total Biaya Energi (IDR)', calculateTotalCost(energy).toFixed(0)],
     ]
     const csv = rows.map((r) => r.join(',')).join('\n')

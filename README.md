@@ -7,7 +7,9 @@ JEJAK adalah platform intelijen energi dan karbon bertenaga AI yang membantu tim
 - Ringkasan KPI energi, karbon, biaya, dan estimasi penghematan
 - Pemantauan energi per area: Lini Produksi, HVAC, Pencahayaan, Utilitas
 - MRV karbon (Scope 1 & 2) dengan status data
-- Estimasi biaya CBAM dan ekspor PDF
+- Pencatatan bahan bakar cair, gas, dan padat (sensor simulasi/input manual) yang dikonversi ke emisi Scope 1
+- Laporan CBAM: nilai terisi otomatis dari telemetri node (bisa di-override), sinkron periodik di browser, histori tersimpan, PDF 3 halaman, dan pengisian sebagian template Excel resmi UE
+- Contoh laporan CBAM publik di `/laporan-cbam` (tanpa masuk dasbor)
 - Wawasan AI dan tanya-jawab berbasis aturan
 - Laporan siap unduh (CSV/PDF) per pabrik dan periode
 - Konsol admin: armada perangkat, alert, dan papan perawatan
@@ -53,4 +55,6 @@ public/         # Aset statis
 ## Catatan
 
 - Angka yang ditampilkan bersifat ilustratif untuk keperluan demonstrasi.
+- NCV dan faktor emisi bahan bakar berada di `src/data/fuelFactors.ts` dan bukan nilai regulasi resmi. Catatan manual disimpan di localStorage browser.
 - Estimasi CBAM bersifat indikatif dan bukan angka resmi maupun nasihat hukum.
+- Template UE yang diisi hanyalah sebagian sheet; tinjau dan lengkapi field lain sebelum pengajuan resmi.
